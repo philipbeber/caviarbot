@@ -7,6 +7,7 @@
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
+var twilio     = require('twilio');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -37,7 +38,10 @@ router.route('/voice')
     .post(function(req, res) {
         console.log('Received voice: ' + JSON.stringify(req.body));
         lastMessage = req.body;
-        res.json({ Say: "Hello, Caviar. I am an automated answering system, but someone will call you back at this number shortly. You can also send text messages to this phone number and someone will read them."});
+        var tresp = new twilio.TwimlResponse();
+        tresp.say("Hello, Caviar. I am an automated answering system, but someone will call you back at this number shortly. You can also send text messages to this phone number and someone will read them.");
+        res.set('Content-Type', 'text/xml');
+        res.send(tresp.toString());
     });
 
 router.route('/status')
