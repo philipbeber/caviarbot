@@ -8,6 +8,7 @@ var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var twilio     = require('twilio');
+var request    = require('request');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -16,7 +17,7 @@ app.use(bodyParser.json());
 
 var port = process.env.PORT || 1337;        // set our port
 
-var lastMessage;
+var lastMessage, status;
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -27,10 +28,26 @@ router.get('/', function(req, res) {
     res.json({ message: 'hooray! welcome to our api!' });   
 });
 
+function alertSlack(text, baseUrl) {
+    uri = process.env.SLACK_URL;
+    message = "@here " + text;
+    iconUrl = baseUrl + "/caviar.png";
+
+    request({
+        uri: uri,
+        method: "POST",
+        json: true,
+        body: {text: message, username: "Caviar", icon_url: iconUrl}
+    }, function (error, response, body) {
+        status = error || "SUCCESS";
+    });
+}
+
 router.route('/sms')
     .post(function(req, res) {
         console.log('Received sms: ' + JSON.stringify(req.body));
         lastMessage = req.body;
+        alertSlack(req.body.Body, "https://" + req.headers.host + req.originalUrl);
         res.send();
     });
 
