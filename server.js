@@ -14,6 +14,7 @@ var request    = require('request');
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use('/static', express.static(__dirname + '/static'));
 
 var port = process.env.PORT || 1337;        // set our port
 
@@ -31,7 +32,7 @@ router.get('/', function(req, res) {
 function alertSlack(text, baseUrl) {
     uri = process.env.SLACK_URL;
     message = "@here " + text;
-    iconUrl = baseUrl + "/caviar.png";
+    iconUrl = baseUrl + "/static/caviar.png";
 
     request({
         uri: uri,
@@ -47,7 +48,7 @@ router.route('/sms')
     .post(function(req, res) {
         console.log('Received sms: ' + JSON.stringify(req.body));
         lastMessage = req.body;
-        alertSlack(req.body.Body, "https://" + req.headers.host + req.originalUrl);
+        alertSlack(req.body.Body, "http://" + req.headers.host);
         res.send();
     });
 
