@@ -56,6 +56,7 @@ router.route('/voice')
     .post(function(req, res) {
         console.log('Received voice: ' + JSON.stringify(req.body));
         lastMessage = req.body;
+        alertSlack('Caviar called the contact number. Please return their call at ' + req.body.From + '. Thanks!', "http://" + req.headers.host);
         var tresp = new twilio.TwimlResponse();
         tresp.say("Hello, Caviar. I am an automated answering system, but someone will call you back at this number shortly. You can also send text messages to this phone number and someone will read them.");
         res.set('Content-Type', 'text/xml');
