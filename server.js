@@ -31,7 +31,21 @@ router.get('/', function(req, res) {
 
 function alertSlack(text, baseUrl) {
     uri = process.env.SLACK_URL;
-    message = "@here " + text;
+
+    // Format message according to https://api.slack.com/docs/formatting
+    message = "<!here> ";
+    for(var i = 0; i < text.length; i++) {
+        if (text[i] === '<') {
+            message += '&lt;';
+        } else if (text[i] === '>') {
+            message += '&gt;';
+        } else if (text[i] === '&') {
+            message += '&amp;';
+        } else {
+            message += text[i];
+        }
+    }
+
     iconUrl = baseUrl + "/static/caviar.png";
 
     request({
